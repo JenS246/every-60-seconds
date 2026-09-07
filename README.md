@@ -5,9 +5,11 @@ Every 60 Seconds is a mobile-first browser game that turns public internet-usage
 ## How it works
 
 - One 60-second round starts from the main button or the first tile tap.
-- Eight tiles cover global data volume, email, search, AI messages, video uploads, selfies, code commits, and voice notes.
+- One overview tile and ten source tiles are organized into Social Media, Communication, Create & Publish, and Search & AI categories.
+- Social Media includes Instagram posts, Facebook shares, and Snapchat selfies; Communication includes email, Slack, and WhatsApp.
+- Each category opens into its own responsive tile grid and keeps a local reveal score alongside the overall round score.
 - Each figure is derived from a linked public source. The methodology section explains the date and conversion basis.
-- The interface supports touch, keyboard navigation, system light and dark modes, and reduced-motion preferences.
+- The interface supports touch, keyboard navigation, mobile and desktop layouts, and reduced-motion preferences.
 
 ## Run locally
 
