@@ -331,9 +331,11 @@ h1 em {
 .metric-topline { align-items: flex-start; display: flex; justify-content: flex-end; position: relative; width: 100%; z-index: 3; }
 .metric-icon { align-items: center; display: flex; }
 .metric-front { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; position: relative; transition: opacity 180ms ease, transform 260ms ease; z-index: 2; }
-.metric-title { font-size: clamp(26px, 2.6vw, 38px); font-weight: 800; letter-spacing: -0.055em; line-height: 0.98; max-width: 100%; overflow-wrap: anywhere; }
+.metric-title { font-size: clamp(26px, 2.6vw, 38px); font-weight: 800; letter-spacing: -0.055em; line-height: 0.98; max-width: 100%; overflow-wrap: normal; text-wrap: balance; word-break: normal; }
+.metric-title.title-long { font-size: clamp(25px, 2.35vw, 34px); }
+.metric-title.title-compact { font-size: clamp(24px, 2.1vw, 30px); }
 .featured .metric-title { font-size: clamp(42px, 6vw, 82px); max-width: 670px; }
-.metric-prompt { font-size: 16px; font-weight: 600; line-height: 1.5; margin-top: 12px; opacity: 0.82; }
+.metric-prompt { font-size: 16px; font-weight: 600; line-height: 1.5; margin-top: 12px; opacity: 0.82; text-wrap: pretty; }
 .tap-cue { align-items: center; display: flex; font-family: var(--font-caption), sans-serif; font-size: 15px; font-weight: 700; gap: 7px; letter-spacing: 0.025em; margin-top: 20px; text-transform: uppercase; }
 
 .metric-answer {
@@ -355,13 +357,15 @@ h1 em {
 .answer-value.value-compact { font-size: clamp(30px, 3.1vw, 40px); }
 .featured .answer-value { font-size: clamp(60px, 9vw, 116px); }
 .answer-value small { display: block; font-size: max(0.34em, 16px); letter-spacing: -0.04em; line-height: 1.2; margin-top: 10px; }
-.answer-fact { font-size: 16px; font-weight: 700; line-height: 1.5; max-width: 440px; overflow-wrap: anywhere; }
+.answer-fact { font-size: 16px; font-weight: 700; line-height: 1.5; max-width: 440px; overflow-wrap: break-word; text-wrap: pretty; }
 
 .metric-source {
   bottom: 20px;
+  display: grid;
   font-family: var(--font-caption), sans-serif;
   font-size: 14px;
   font-weight: 600;
+  gap: 2px;
   letter-spacing: 0.01em;
   line-height: 1.35;
   left: var(--card-pad);
@@ -372,6 +376,8 @@ h1 em {
   text-underline-offset: 3px;
   z-index: 5;
 }
+
+.source-date { opacity: 0.8; white-space: nowrap; }
 
 .metric-card.revealed .metric-front { opacity: 0; transform: translateY(20px); }
 .metric-card.revealed .metric-answer { opacity: 1; transform: translateY(0); }
@@ -456,10 +462,9 @@ footer a { font-weight: 800; }
   .category-body { padding: 10px; }
   .metric-grid { grid-template-columns: 1fr; }
   .metric-card { min-height: 410px; }
-  .metric-card.featured { min-height: 360px; }
-  .metric-card.featured { --card-pad: 28px; }
-  .featured .metric-trigger { padding: 25px var(--card-pad) 54px; }
-  .featured .metric-answer { inset: 88px var(--card-pad) 49px; }
+  .metric-card.featured { --card-pad: 28px; min-height: 410px; }
+  .featured .metric-trigger { padding: 25px var(--card-pad) var(--source-clearance); }
+  .featured .metric-answer { inset: 88px var(--card-pad) var(--source-clearance); }
   .method { grid-template-columns: 1fr; padding: 92px 20px; }
   .method-intro { position: static; }
   footer { align-items: flex-start; flex-direction: column; gap: 12px; padding: 26px 20px; }

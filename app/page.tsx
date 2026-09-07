@@ -4,6 +4,7 @@ import {
   ArrowClockwise,
   Brain,
   Browser,
+  Browsers,
   Butterfly,
   Camera,
   CaretDown,
@@ -38,7 +39,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Status = "idle" | "running" | "finished";
-type CategoryId = "social" | "communication" | "creation" | "ai" | "search" | "downloads";
+type CategoryId = "social" | "communication" | "creation" | "ai" | "search" | "browsers" | "downloads";
 
 type Metric = {
   id: string;
@@ -483,6 +484,42 @@ const metrics: Metric[] = [
     estimated: true,
   },
   {
+    id: "safari-requests",
+    category: "browsers",
+    eyebrow: "Safari",
+    title: "Safari web requests",
+    prompt: "Requests attributed to Safari browsing",
+    value: 769_338_000,
+    suffix: " HTTP requests",
+    fact: "That is a directional estimate of 12.8 million requests each second.",
+    source: "Cloudflare + Statcounter",
+    sourceUrl: "https://blog.cloudflare.com/radar-2025-year-in-review/",
+    basis: "Cloudflare reports 81 million average HTTP requests per second. Applying Safari's 15.83% August 2026 worldwide browser share gives this directional estimate.",
+    sourceDate: "2025 baseline; August 2026 share",
+    Icon: Compass,
+    accent: "#78d8ff",
+    ink: "#063448",
+    estimated: true,
+  },
+  {
+    id: "firefox-requests",
+    category: "browsers",
+    eyebrow: "Firefox",
+    title: "Firefox web requests",
+    prompt: "Requests attributed to Firefox browsing",
+    value: 144_828_000,
+    suffix: " HTTP requests",
+    fact: "That is a directional estimate of 2.4 million requests each second.",
+    source: "Cloudflare + Statcounter",
+    sourceUrl: "https://gs.statcounter.com/browser-market-share/monthly",
+    basis: "Cloudflare reports 81 million average HTTP requests per second. Applying Firefox's 2.98% August 2026 worldwide browser share gives this directional estimate.",
+    sourceDate: "2025 baseline; August 2026 share",
+    Icon: GlobeSimple,
+    accent: "#ff9d6c",
+    ink: "#461b08",
+    estimated: true,
+  },
+  {
     id: "chatgpt",
     category: "ai",
     eyebrow: "ChatGPT",
@@ -657,6 +694,15 @@ const categories: Category[] = [
     Icon: MagnifyingGlass,
   },
   {
+    id: "browsers",
+    eyebrow: "Web browsers",
+    title: "Web browsers",
+    description: "A directional view of requests carried by Safari and Firefox.",
+    accent: "#7bcff2",
+    ink: "#07384b",
+    Icon: Browsers,
+  },
+  {
     id: "downloads",
     eyebrow: "Installs",
     title: "Downloads",
@@ -679,6 +725,13 @@ function valueSizeClass(metric: Metric) {
   const length = formatValue(metric).length;
   if (length >= 9) return "value-compact";
   if (length >= 6) return "value-long";
+  return "";
+}
+
+function titleSizeClass(metric: Metric) {
+  const longestWord = metric.title.split(" ").reduce((longest, word) => Math.max(longest, word.length), 0);
+  if (longestWord >= 10) return "title-compact";
+  if (metric.title.length >= 18) return "title-long";
   return "";
 }
 
@@ -741,7 +794,7 @@ function MetricCard({
         </span>
 
         <span className="metric-front">
-          <span className="metric-title">{metric.title}</span>
+          <span className={`metric-title ${titleSizeClass(metric)}`}>{metric.title}</span>
           <span className="metric-prompt">{metric.prompt}</span>
           <span className="tap-cue"><Sparkle size={16} weight="fill" /> Tap to reveal</span>
         </span>
@@ -762,7 +815,8 @@ function MetricCard({
       </button>
 
       <a className="metric-source" href={metric.sourceUrl} target="_blank" rel="noreferrer">
-        {metric.source} · {metric.sourceDate}
+        <span>{metric.source}</span>
+        <span className="source-date">{metric.sourceDate}</span>
       </a>
     </article>
   );
