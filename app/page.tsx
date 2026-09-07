@@ -52,6 +52,7 @@ type Metric = {
   fact: string;
   source: string;
   sourceUrl: string;
+  sourceLinks?: { label: string; url: string }[];
   basis: string;
   sourceDate: string;
   Icon: typeof Cloud;
@@ -98,10 +99,10 @@ const metrics: Metric[] = [
     value: 69_444,
     suffix: " posts",
     fact: "That is roughly 1,157 new posts every second.",
-    source: "Skeepers UGC Guide 2025",
+    source: "Skeepers 2025 compilation",
     sourceUrl: "https://get.skeepers.io/hubfs/Ebooks%20and%20Guides/2025-SKP-EN-EBK-LSE-UGC-eBook.pdf",
-    basis: "100 million photos and videos uploaded per day, divided by 1,440 minutes.",
-    sourceDate: "2025 guide; rounded public estimate",
+    basis: "The guide repeats a widely cited estimate of 100 million photos and videos uploaded per day. It does not state when the underlying platform measurement was taken, so this is a rough benchmark rather than a current Instagram count.",
+    sourceDate: "2025 guide; measurement date not stated",
     Icon: InstagramLogo,
     accent: "#ff79c8",
     ink: "#3a0826",
@@ -116,10 +117,10 @@ const metrics: Metric[] = [
     value: 3_263_889,
     suffix: " shared items",
     fact: "That works out to more than 54,000 shares a second.",
-    source: "Skeepers UGC Guide 2025",
+    source: "Skeepers 2025 compilation",
     sourceUrl: "https://get.skeepers.io/hubfs/Ebooks%20and%20Guides/2025-SKP-EN-EBK-LSE-UGC-eBook.pdf",
-    basis: "4.7 billion items shared per day, divided by 1,440 minutes.",
-    sourceDate: "2025 guide; rounded public estimate",
+    basis: "The guide repeats a widely cited estimate of 4.7 billion Facebook items shared per day. It does not state when the underlying platform measurement was taken, and the total includes more than status updates alone.",
+    sourceDate: "2025 guide; measurement date not stated",
     Icon: FacebookLogo,
     accent: "#6ba4ff",
     ink: "#071f4b",
@@ -131,13 +132,13 @@ const metrics: Metric[] = [
     eyebrow: "X / Twitter",
     title: "X posts",
     prompt: "Posts sent into the public conversation",
-    value: 360_000,
+    value: 347_222,
     suffix: " posts",
-    fact: "About 6,000 posts arrive on X every second.",
-    source: "Domo Data Never Sleeps 11.0 via Marketing Dive",
+    fact: "About 5,787 posts, replies, quotes, and reposts arrive every second.",
+    source: "X figures via Marketing Dive",
     sourceUrl: "https://www.marketingdive.com/news/x-seeing-more-usage-new-reports-indicate-rising-web-traffic/702926/",
-    basis: "Domo's published per-minute figure. X no longer regularly discloses global post volume.",
-    sourceDate: "December 2023; latest strong public benchmark",
+    basis: "X reported 100 million original posts, 100 million replies, and 300 million quote posts and reposts per day. The combined 500 million daily actions are divided by 1,440 minutes. X does not regularly publish a newer global total.",
+    sourceDate: "September 2023 company figures",
     Icon: XLogo,
     accent: "#f1f1f1",
     ink: "#111111",
@@ -185,13 +186,13 @@ const metrics: Metric[] = [
     eyebrow: "Snapchat",
     title: "Snapchat snaps",
     prompt: "Photos and videos created",
-    value: 3_300_000,
+    value: 3_800_000,
     suffix: " snaps",
-    fact: "That is about 55,000 new snaps every second.",
-    source: "Domo Data Never Sleeps 12.0",
-    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
-    basis: "Domo's published per-minute figure.",
-    sourceDate: "December 2024",
+    fact: "That is about 63,000 new snaps every second.",
+    source: "Snap Newsroom",
+    sourceUrl: "https://newsroom.snap.com/2trillion-snaps-in-2025",
+    basis: "Snap reports nearly 2 trillion Snaps created in 2025 and publishes the normalized rate of 3.8 million per minute.",
+    sourceDate: "March 2026; covers 2025",
     Icon: Camera,
     accent: "#ffe84c",
     ink: "#302500",
@@ -207,9 +208,13 @@ const metrics: Metric[] = [
     suffix: " emails",
     fact: "More than 4.1 million emails leave an outbox every second.",
     source: "Domo Data Never Sleeps 12.0",
-    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
-    basis: "Domo's published per-minute figure.",
-    sourceDate: "December 2024",
+    sourceUrl: "https://www.domo.com/learn/infographic/data-never-sleeps-12",
+    sourceLinks: [
+      { label: "Domo report", url: "https://www.domo.com/learn/infographic/data-never-sleeps-12" },
+      { label: "Domo methodology note", url: "https://www.domo.com/blog/snap-tiktok-doordash-netflix-exploring-2024-in-data" },
+    ],
+    basis: "Domo's 2024 secondary compilation reports 251.1 million emails per minute. Domo identifies its overall source pool but does not map this individual figure to a specific underlying dataset.",
+    sourceDate: "December 2024; secondary estimate",
     Icon: EnvelopeSimple,
     accent: "#ff805d",
     ink: "#3c1107",
@@ -225,12 +230,17 @@ const metrics: Metric[] = [
     suffix: " text messages",
     fact: "More than 313,000 texts are sent every second.",
     source: "Domo Data Never Sleeps 12.0",
-    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
-    basis: "Domo's published per-minute figure.",
-    sourceDate: "December 2024",
+    sourceUrl: "https://www.domo.com/learn/infographic/data-never-sleeps-12",
+    sourceLinks: [
+      { label: "Domo report", url: "https://www.domo.com/learn/infographic/data-never-sleeps-12" },
+      { label: "Domo methodology note", url: "https://www.domo.com/blog/snap-tiktok-doordash-netflix-exploring-2024-in-data" },
+    ],
+    basis: "Domo's 2024 secondary compilation reports 18.8 million text messages per minute. Domo identifies its overall source pool but does not map this individual figure to a specific underlying dataset.",
+    sourceDate: "December 2024; secondary estimate",
     Icon: ChatText,
     accent: "#ffbd73",
     ink: "#3f2100",
+    estimated: true,
   },
   {
     id: "slack",
@@ -238,16 +248,17 @@ const metrics: Metric[] = [
     eyebrow: "Slack",
     title: "Slack messages",
     prompt: "Workplace messages sent",
-    value: 1_040_000,
+    value: 694_444,
     suffix: " messages",
-    fact: "Around 17,300 Slack messages land every second.",
-    source: "Domo Data Never Sleeps 12.0",
-    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
-    basis: "Domo's published per-minute figure.",
-    sourceDate: "2024 edition, awarded 2025",
+    fact: "Around 11,574 Slack messages land every second.",
+    source: "Salesforce FY26 earnings remarks",
+    sourceUrl: "https://s205.q4cdn.com/626266368/files/doc_financials/2026/q4/Transcript-Salesforce-Inc-Q4-FY26-Earnings-Conference-Call-2-25-26.pdf",
+    basis: "Salesforce CEO Marc Benioff said Slack hosts about 1 billion messages per day. That company figure is divided by 1,440 minutes.",
+    sourceDate: "February 2026",
     Icon: SlackLogo,
     accent: "#70e2d1",
     ink: "#063832",
+    estimated: true,
   },
   {
     id: "discord",
@@ -313,7 +324,7 @@ const metrics: Metric[] = [
     suffix: " videos",
     fact: "Creators upload over 230 videos every second.",
     source: "YouTube Press",
-    sourceUrl: "https://blog.youtube/press/",
+    sourceUrl: "https://blog.youtube/news-and-events/happy-birthday-youtube-20/",
     basis: "Over 20 million videos uploaded daily, divided by 1,440 minutes.",
     sourceDate: "April 2025",
     Icon: VideoCamera,
@@ -330,10 +341,10 @@ const metrics: Metric[] = [
     value: 1_876,
     suffix: " commits",
     fact: "That is roughly 31 code commits every second.",
-    source: "GitHub Octoverse 2024",
-    sourceUrl: "https://github.blog/news-insights/octoverse/octoverse-2024/",
-    basis: "993 million contributions in 2024; commits were 52.7%, divided across the year.",
-    sourceDate: "October 2024",
+    source: "GitHub Octoverse 2025",
+    sourceUrl: "https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/",
+    basis: "GitHub reports 986 million commits pushed in 2025. Dividing that total across 525,600 minutes gives roughly 1,876 commits per minute.",
+    sourceDate: "October 2025",
     Icon: Code,
     accent: "#c6a5ff",
     ink: "#27104a",
@@ -345,13 +356,13 @@ const metrics: Metric[] = [
     eyebrow: "Domain names",
     title: "New domains",
     prompt: ".com and .net addresses registered",
-    value: 88.73,
+    value: 96.92,
     suffix: " domains",
-    fact: "A new .com or .net name is registered about every 0.7 seconds.",
-    source: "Verisign DNIB Q1 2026",
-    sourceUrl: "https://investor.verisign.com/node/26331/pdf",
-    basis: "11.5 million new .com and .net registrations in Q1 2026, divided across the quarter's 129,600 minutes.",
-    sourceDate: "April 2026",
+    fact: "A new .com or .net name is registered about every 0.6 seconds.",
+    source: "Verisign Q2 2026 results",
+    sourceUrl: "https://investor.verisign.com/news-releases/news-release-details/verisign-reports-second-quarter-2026-results",
+    basis: "Verisign processed 12.7 million new .com and .net registrations in Q2 2026. Dividing that total across the quarter's 131,040 minutes gives this rate.",
+    sourceDate: "July 2026",
     Icon: GlobeSimple,
     accent: "#ffd36a",
     ink: "#392600",
@@ -386,6 +397,10 @@ const metrics: Metric[] = [
     fact: "That is an estimated 7,832 Bing searches every second.",
     source: "Google baseline + Statcounter",
     sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    sourceLinks: [
+      { label: "Google annual search total", url: "https://blog.google/products/ads-commerce/new-ways-retailers-can-win-over-strategic-consumers/" },
+      { label: "Statcounter search share", url: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide" },
+    ],
     basis: "Estimated by applying Bing's 4.5% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
     sourceDate: "August 2026",
     Icon: WindowsLogo,
@@ -404,6 +419,10 @@ const metrics: Metric[] = [
     fact: "That is an estimated 2,141 Yahoo searches every second.",
     source: "Google baseline + Statcounter",
     sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    sourceLinks: [
+      { label: "Google annual search total", url: "https://blog.google/products/ads-commerce/new-ways-retailers-can-win-over-strategic-consumers/" },
+      { label: "Statcounter search share", url: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide" },
+    ],
     basis: "Estimated by applying Yahoo's 1.23% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
     sourceDate: "August 2026",
     Icon: Compass,
@@ -422,6 +441,10 @@ const metrics: Metric[] = [
     fact: "That is an estimated 1,723 Yandex searches every second.",
     source: "Google baseline + Statcounter",
     sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    sourceLinks: [
+      { label: "Google annual search total", url: "https://blog.google/products/ads-commerce/new-ways-retailers-can-win-over-strategic-consumers/" },
+      { label: "Statcounter search share", url: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide" },
+    ],
     basis: "Estimated by applying Yandex's 0.99% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
     sourceDate: "August 2026",
     Icon: Translate,
@@ -440,6 +463,10 @@ const metrics: Metric[] = [
     fact: "That is an estimated 1,079 Baidu searches every second.",
     source: "Google baseline + Statcounter",
     sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    sourceLinks: [
+      { label: "Google annual search total", url: "https://blog.google/products/ads-commerce/new-ways-retailers-can-win-over-strategic-consumers/" },
+      { label: "Statcounter search share", url: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide" },
+    ],
     basis: "Estimated by applying Baidu's 0.62% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
     sourceDate: "August 2026",
     Icon: GlobeHemisphereEast,
@@ -476,6 +503,10 @@ const metrics: Metric[] = [
     fact: "That is an estimated 1,218 DuckDuckGo searches each second.",
     source: "Google baseline + Statcounter",
     sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    sourceLinks: [
+      { label: "Google annual search total", url: "https://blog.google/products/ads-commerce/new-ways-retailers-can-win-over-strategic-consumers/" },
+      { label: "Statcounter search share", url: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide" },
+    ],
     basis: "Estimated by applying DuckDuckGo's 0.7% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
     sourceDate: "August 2026",
     Icon: MagnifyingGlass,
@@ -494,6 +525,10 @@ const metrics: Metric[] = [
     fact: "That is a directional estimate of 12.8 million requests each second.",
     source: "Cloudflare + Statcounter",
     sourceUrl: "https://blog.cloudflare.com/radar-2025-year-in-review/",
+    sourceLinks: [
+      { label: "Cloudflare request baseline", url: "https://blog.cloudflare.com/radar-2025-year-in-review/" },
+      { label: "Statcounter browser share", url: "https://gs.statcounter.com/browser-market-share/monthly" },
+    ],
     basis: "Cloudflare reports 81 million average HTTP requests per second. Applying Safari's 15.83% August 2026 worldwide browser share gives this directional estimate.",
     sourceDate: "2025 baseline; August 2026 share",
     Icon: Compass,
@@ -512,6 +547,10 @@ const metrics: Metric[] = [
     fact: "That is a directional estimate of 2.4 million requests each second.",
     source: "Cloudflare + Statcounter",
     sourceUrl: "https://gs.statcounter.com/browser-market-share/monthly",
+    sourceLinks: [
+      { label: "Cloudflare request baseline", url: "https://blog.cloudflare.com/radar-2025-year-in-review/" },
+      { label: "Statcounter browser share", url: "https://gs.statcounter.com/browser-market-share/monthly" },
+    ],
     basis: "Cloudflare reports 81 million average HTTP requests per second. Applying Firefox's 2.98% August 2026 worldwide browser share gives this directional estimate.",
     sourceDate: "2025 baseline; August 2026 share",
     Icon: GlobeSimple,
@@ -529,7 +568,7 @@ const metrics: Metric[] = [
     suffix: " messages",
     fact: "People send nearly 29,000 prompts every second.",
     source: "OpenAI Signals",
-    sourceUrl: "https://cdn.openai.com/global-affairs/be0fe9e0-eb97-43d1-9614-99f2bd948bcc/OpenAI_Productivity-Note_Jul-2025.pdf",
+    sourceUrl: "https://openai.com/global-affairs/new-economic-analysis/",
     basis: "2.5 billion messages per day, divided by 1,440 minutes.",
     sourceDate: "July 2025",
     Icon: Brain,
@@ -637,7 +676,7 @@ const metrics: Metric[] = [
     suffix: " package downloads",
     fact: "Developers download React about 284 times every second.",
     source: "npm Downloads API",
-    sourceUrl: "https://api.npmjs.org/downloads/point/last-week/react",
+    sourceUrl: "https://api.npmjs.org/downloads/point/2026-08-23:2026-08-29/react",
     basis: "171,637,376 React package downloads from August 23-29, 2026, divided across one week.",
     sourceDate: "August 2026",
     Icon: Package,
@@ -973,6 +1012,7 @@ export default function Home() {
         <div className="method-intro">
           <h2>How the minute is made</h2>
           <p>Every figure is normalized to 60 seconds from the newest credible public total we could find. Platform reporting is uneven, so estimates are labeled and older disclosures are dated instead of pretending they are live counters.</p>
+          <p className="domo-note"><strong>What is Domo?</strong> Domo is a business intelligence company, not a social platform or an official internet census. Its annual <a href="https://www.domo.com/learn/infographic/data-never-sleeps-12" target="_blank" rel="noreferrer">Data Never Sleeps</a> graphic compiles statistics from outside sources. We use it only where no stronger current platform disclosure is available, and label those figures as secondary estimates.</p>
         </div>
         <div className="method-list">
           {[overviewMetric, ...metrics].map((metric) => (
@@ -982,7 +1022,12 @@ export default function Home() {
                 <strong>{metric.estimated ? "Estimated" : "Reported"}</strong>
               </summary>
               <p>{metric.basis}</p>
-              <a href={metric.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a>
+              <span className="method-source-date">{metric.sourceDate}</span>
+              <span className="method-links">
+                {(metric.sourceLinks ?? [{ label: metric.source, url: metric.sourceUrl }]).map((link) => (
+                  <a href={link.url} target="_blank" rel="noreferrer" key={link.url}>{link.label} ↗</a>
+                ))}
+              </span>
             </details>
           ))}
         </div>
