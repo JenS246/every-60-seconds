@@ -1,0 +1,35 @@
+# Every 60 Seconds
+
+Every 60 Seconds is a mobile-first browser game that turns public internet-usage statistics into a one-minute interactive challenge. Players start the clock, tap bright data tiles, and watch each counter build toward its estimated 60-second total.
+
+## How it works
+
+- One 60-second round starts from the main button or the first tile tap.
+- Eight tiles cover global data volume, email, search, AI messages, video uploads, selfies, code commits, and voice notes.
+- Each figure is derived from a linked public source. The methodology section explains the date and conversion basis.
+- The interface supports touch, keyboard navigation, system light and dark modes, and reduced-motion preferences.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+For a production build:
+
+```bash
+npm run build
+```
+
+## Publishing
+
+This project is configured for OpenAI Sites through `.openai/hosting.json`. The live URL is added here after the first deployment.
+
+## Data notes
+
+Platform figures are snapshots, forecasts, or company-reported totals from different dates. The game converts them into per-minute rates for educational comparison. It does not claim to be a live measurement feed.
+
+## Services
+
+No backend, database, user account, analytics service, or API key is required.
