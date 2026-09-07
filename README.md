@@ -26,9 +26,11 @@ npm run build
 
 ## Publishing
 
-This project is configured for OpenAI Sites through `.openai/hosting.json`.
+The site is published from the `main` branch by GitHub Actions and hosted on GitHub Pages.
 
-Live site: https://every-60-seconds.dschnei1122.chatgpt.site
+Source: https://github.com/JenS246/every-60-seconds
+
+Live site: https://jens246.github.io/every-60-seconds/
 
 ## Data notes
 
