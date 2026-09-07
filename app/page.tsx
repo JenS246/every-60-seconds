@@ -71,7 +71,7 @@ type Category = {
 
 const overviewMetric: Metric = {
   id: "datasphere",
-  eyebrow: "The big picture",
+  eyebrow: "All new data",
   title: "All new data",
   prompt: "How much data is created or replicated?",
   value: 332.95,
@@ -737,7 +737,6 @@ function MetricCard({
     >
       <button className="metric-trigger" onClick={() => onReveal(metric)} aria-expanded={revealed}>
         <span className="metric-topline">
-          <span className="metric-eyebrow">{metric.eyebrow}</span>
           <span className="metric-icon"><Icon size={featured ? 42 : 34} weight="duotone" /></span>
         </span>
 
@@ -834,7 +833,6 @@ export default function Home() {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="overline">A one-minute data game</p>
           <h1>The internet makes <em>a lot</em> in 60 seconds.</h1>
           <p className="hero-intro">Open a category. Tap each data stream. See how much of our digital world appears before the clock runs out.</p>
           <button className="start-button" onClick={startRound}>
@@ -850,16 +848,12 @@ export default function Home() {
               <span className="timer-label">seconds</span>
             </div>
           </div>
-          <span className="orbit-note">{status === "idle" ? "Ready when you are" : status === "finished" ? "Minute complete" : "The data keeps moving"}</span>
         </div>
       </section>
 
       <section className="game-section" aria-labelledby="game-title">
         <div className="section-heading">
-          <div>
-            <p className="overline">Pick your rabbit hole</p>
-            <h2 id="game-title">What gets made in a minute?</h2>
-          </div>
+          <h2 id="game-title">What gets made in a minute?</h2>
           <div className="score-pill" aria-live="polite">
             <strong>{revealed.size}</strong> / {totalMetrics} revealed
           </div>
@@ -896,7 +890,6 @@ export default function Home() {
                 >
                   <span className="category-icon"><CategoryIcon size={42} weight="duotone" /></span>
                   <span className="category-copy">
-                    <span className="category-eyebrow">{category.eyebrow}</span>
                     <span className="category-title">{category.title}</span>
                     <span className="category-description">{category.description}</span>
                   </span>
@@ -924,7 +917,6 @@ export default function Home() {
 
       <section className="method" id="method">
         <div className="method-intro">
-          <p className="overline">Read the small print</p>
           <h2>How the minute is made</h2>
           <p>Every figure is normalized to 60 seconds from the newest credible public total we could find. Platform reporting is uneven, so estimates are labeled and older disclosures are dated instead of pretending they are live counters.</p>
         </div>
@@ -932,7 +924,7 @@ export default function Home() {
           {[overviewMetric, ...metrics].map((metric) => (
             <details key={metric.id}>
               <summary>
-                <span>{metric.eyebrow}</span>
+                <span>{metric.title}</span>
                 <strong>{metric.estimated ? "Estimated" : "Reported"}</strong>
               </summary>
               <p>{metric.basis}</p>
