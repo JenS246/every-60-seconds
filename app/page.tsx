@@ -7,25 +7,32 @@ import {
   Butterfly,
   Camera,
   CaretDown,
+  ChatText,
   ChatsCircle,
   Cloud,
   Code,
+  Compass,
+  DiscordLogo,
   DownloadSimple,
   EnvelopeSimple,
   FacebookLogo,
   GameController,
+  GlobeHemisphereEast,
   GlobeSimple,
   InstagramLogo,
   MagnifyingGlass,
   Megaphone,
+  MicrosoftTeamsLogo,
   Play,
   Package,
   Robot,
   SlackLogo,
   Sparkle,
   ThreadsLogo,
+  Translate,
   UsersThree,
   VideoCamera,
+  WindowsLogo,
   XLogo,
 } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -126,8 +133,8 @@ const metrics: Metric[] = [
     value: 360_000,
     suffix: " posts",
     fact: "About 6,000 posts arrive on X every second.",
-    source: "Domo Data Never Sleeps 11.0",
-    sourceUrl: "https://www.businesswire.com/news/home/20231214558619/en/Domo-Releases-11th-Annual-Data-Never-Sleeps-Report",
+    source: "Domo Data Never Sleeps 11.0 via Marketing Dive",
+    sourceUrl: "https://www.marketingdive.com/news/x-seeing-more-usage-new-reports-indicate-rising-web-traffic/702926/",
     basis: "Domo's published per-minute figure. X no longer regularly discloses global post volume.",
     sourceDate: "December 2023; latest strong public benchmark",
     Icon: XLogo,
@@ -175,15 +182,15 @@ const metrics: Metric[] = [
     id: "snapchat",
     category: "social",
     eyebrow: "Snapchat",
-    title: "Snapchat selfies",
-    prompt: "Camera snaps created",
-    value: 1_902_588,
-    suffix: " selfies",
-    fact: "More than 31,700 selfies are captured every second.",
-    source: "Snap Inc. Q2 2025",
-    sourceUrl: "https://investor.snap.com/news/news-details/2025/Snap-Inc--Announces-Second-Quarter-2025-Financial-Results/default.aspx",
-    basis: "Over 5 billion Snaps created daily; 55% are selfies, divided by 1,440 minutes.",
-    sourceDate: "August 2025",
+    title: "Snapchat snaps",
+    prompt: "Photos and videos created",
+    value: 3_300_000,
+    suffix: " snaps",
+    fact: "That is about 55,000 new snaps every second.",
+    source: "Domo Data Never Sleeps 12.0",
+    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
+    basis: "Domo's published per-minute figure.",
+    sourceDate: "December 2024",
     Icon: Camera,
     accent: "#ffe84c",
     ink: "#302500",
@@ -195,17 +202,34 @@ const metrics: Metric[] = [
     eyebrow: "Email",
     title: "Emails sent",
     prompt: "Messages crossing inboxes",
-    value: 261_388_889,
+    value: 251_100_000,
     suffix: " emails",
-    fact: "More than 4.3 million emails leave an outbox every second.",
-    source: "Radicati Email Statistics 2024-2028",
-    sourceUrl: "https://www.radicati.com/wp/wp-content/uploads/2024/12/Email-Statistics-Report-2024-2028-Executive-Summary.pdf",
-    basis: "376.4 billion emails projected per day in 2025, divided by 1,440 minutes.",
-    sourceDate: "2024 forecast for 2025",
+    fact: "More than 4.1 million emails leave an outbox every second.",
+    source: "Domo Data Never Sleeps 12.0",
+    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
+    basis: "Domo's published per-minute figure.",
+    sourceDate: "December 2024",
     Icon: EnvelopeSimple,
     accent: "#ff805d",
     ink: "#3c1107",
     estimated: true,
+  },
+  {
+    id: "text-messages",
+    category: "communication",
+    eyebrow: "SMS / MMS",
+    title: "Text messages",
+    prompt: "Texts sent between phones",
+    value: 18_800_000,
+    suffix: " text messages",
+    fact: "More than 313,000 texts are sent every second.",
+    source: "Domo Data Never Sleeps 12.0",
+    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
+    basis: "Domo's published per-minute figure.",
+    sourceDate: "December 2024",
+    Icon: ChatText,
+    accent: "#ffbd73",
+    ink: "#3f2100",
   },
   {
     id: "slack",
@@ -217,12 +241,48 @@ const metrics: Metric[] = [
     suffix: " messages",
     fact: "Around 17,300 Slack messages land every second.",
     source: "Domo Data Never Sleeps 12.0",
-    sourceUrl: "https://www.domoinvestors.com/news/news-details/2025/Domos-Data-Never-Sleeps-Infographic-Wins-2025-Communicator-Award/default.aspx",
+    sourceUrl: "https://learn.k20center.ou.edu/professional-learning/6/Data%20Never%20Sleeps%20Infographic%202024.pdf?language=English&rev=45064",
     basis: "Domo's published per-minute figure.",
     sourceDate: "2024 edition, awarded 2025",
     Icon: SlackLogo,
     accent: "#70e2d1",
     ink: "#063832",
+  },
+  {
+    id: "discord",
+    category: "communication",
+    eyebrow: "Discord",
+    title: "Discord messages",
+    prompt: "Messages posted in servers and DMs",
+    value: 668_000,
+    suffix: " messages",
+    fact: "That is more than 11,000 Discord messages every second.",
+    source: "Domo 2021 via Technology Coalition",
+    sourceUrl: "https://technologycoalition.org/resources/the-issue/",
+    basis: "Domo's published per-minute estimate. Discord has not released a newer global message total.",
+    sourceDate: "2021 benchmark, cited June 2022",
+    Icon: DiscordLogo,
+    accent: "#8d9cff",
+    ink: "#111842",
+    estimated: true,
+  },
+  {
+    id: "microsoft-teams",
+    category: "communication",
+    eyebrow: "Microsoft Teams",
+    title: "Teams messages",
+    prompt: "Work chats and channel posts",
+    value: 11_834,
+    suffix: " messages",
+    fact: "Teams carries about 197 chat messages every second.",
+    source: "2023 Internet Minute source notes",
+    sourceUrl: "https://ediscoverytoday.com/wp-content/uploads/2023/04/2023-Internet-Minute-Infographic-Source-Stats.pdf",
+    basis: "6.22 billion annual Teams chats, divided into 525,600 minutes.",
+    sourceDate: "April 2023; latest public message estimate",
+    Icon: MicrosoftTeamsLogo,
+    accent: "#b7a5ff",
+    ink: "#22144d",
+    estimated: true,
   },
   {
     id: "whatsapp",
@@ -234,7 +294,7 @@ const metrics: Metric[] = [
     suffix: " voice messages",
     fact: "That is about 81,000 voice notes every second.",
     source: "Meta / WhatsApp",
-    sourceUrl: "https://about.fb.com/news/2022/03/new-ways-to-enjoy-whatsapp-voice-messages/",
+    sourceUrl: "https://about.fb.com/news/2022/03/new-voice-message-features-on-whatsapp/",
     basis: "7 billion voice messages per day, divided by 1,440 minutes.",
     sourceDate: "March 2022; latest disclosed total",
     Icon: ChatsCircle,
@@ -306,12 +366,84 @@ const metrics: Metric[] = [
     suffix: " searches",
     fact: "Almost 159,000 searches begin every second.",
     source: "Google Search update",
-    sourceUrl: "https://blog.google/products/search/how-google-search-delivers-accurate-results/",
+    sourceUrl: "https://blog.google/products/ads-commerce/new-ways-retailers-can-win-over-strategic-consumers/",
     basis: "More than 5 trillion searches per year, divided into 525,600 minutes.",
     sourceDate: "March 2025",
     Icon: MagnifyingGlass,
     accent: "#68d7ff",
     ink: "#002f42",
+    estimated: true,
+  },
+  {
+    id: "bing-search",
+    category: "search",
+    eyebrow: "Microsoft Bing",
+    title: "Bing searches",
+    prompt: "Searches across Microsoft's engine",
+    value: 469_904,
+    suffix: " searches",
+    fact: "That is an estimated 7,832 Bing searches every second.",
+    source: "Google baseline + Statcounter",
+    sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    basis: "Estimated by applying Bing's 4.5% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
+    sourceDate: "August 2026",
+    Icon: WindowsLogo,
+    accent: "#7ddad1",
+    ink: "#063a36",
+    estimated: true,
+  },
+  {
+    id: "yahoo-search",
+    category: "search",
+    eyebrow: "Yahoo Search",
+    title: "Yahoo searches",
+    prompt: "Queries made through Yahoo",
+    value: 128_440,
+    suffix: " searches",
+    fact: "That is an estimated 2,141 Yahoo searches every second.",
+    source: "Google baseline + Statcounter",
+    sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    basis: "Estimated by applying Yahoo's 1.23% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
+    sourceDate: "August 2026",
+    Icon: Compass,
+    accent: "#d5adff",
+    ink: "#2f1048",
+    estimated: true,
+  },
+  {
+    id: "yandex-search",
+    category: "search",
+    eyebrow: "Yandex Search",
+    title: "Yandex searches",
+    prompt: "Queries made through Yandex",
+    value: 103_379,
+    suffix: " searches",
+    fact: "That is an estimated 1,723 Yandex searches every second.",
+    source: "Google baseline + Statcounter",
+    sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    basis: "Estimated by applying Yandex's 0.99% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
+    sourceDate: "August 2026",
+    Icon: Translate,
+    accent: "#ff877d",
+    ink: "#42100c",
+    estimated: true,
+  },
+  {
+    id: "baidu-search",
+    category: "search",
+    eyebrow: "Baidu Search",
+    title: "Baidu searches",
+    prompt: "Queries made through Baidu",
+    value: 64_742,
+    suffix: " searches",
+    fact: "That is an estimated 1,079 Baidu searches every second.",
+    source: "Google baseline + Statcounter",
+    sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    basis: "Estimated by applying Baidu's 0.62% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
+    sourceDate: "August 2026",
+    Icon: GlobeHemisphereEast,
+    accent: "#8fb4ff",
+    ink: "#0c2859",
     estimated: true,
   },
   {
@@ -338,13 +470,13 @@ const metrics: Metric[] = [
     eyebrow: "DuckDuckGo",
     title: "DuckDuckGo searches",
     prompt: "Privacy-focused search queries",
-    value: 71_323,
+    value: 73_096,
     suffix: " searches",
-    fact: "That is roughly 1,189 DuckDuckGo searches each second.",
-    source: "DuckDuckGo public traffic count",
-    sourceUrl: "https://duckduckgo.com/traffic",
-    basis: "102.7 million average daily searches, divided by 1,440 minutes.",
-    sourceDate: "2022; latest disclosed traffic count",
+    fact: "That is an estimated 1,218 DuckDuckGo searches each second.",
+    source: "Google baseline + Statcounter",
+    sourceUrl: "https://gs.statcounter.com/search-engine-market-share/all/worldwide/worldwide",
+    basis: "Estimated by applying DuckDuckGo's 0.7% August 2026 worldwide share to Google's disclosed 5 trillion yearly searches and 91.1% share.",
+    sourceDate: "August 2026",
     Icon: MagnifyingGlass,
     accent: "#f7b6a5",
     ink: "#43180f",
@@ -360,7 +492,7 @@ const metrics: Metric[] = [
     suffix: " messages",
     fact: "People send nearly 29,000 prompts every second.",
     source: "OpenAI Signals",
-    sourceUrl: "https://openai.com/index/how-people-are-using-chatgpt/",
+    sourceUrl: "https://cdn.openai.com/global-affairs/be0fe9e0-eb97-43d1-9614-99f2bd948bcc/OpenAI_Productivity-Note_Jul-2025.pdf",
     basis: "2.5 billion messages per day, divided by 1,440 minutes.",
     sourceDate: "July 2025",
     Icon: Brain,
@@ -519,7 +651,7 @@ const categories: Category[] = [
     id: "search",
     eyebrow: "Discovery",
     title: "Search engines",
-    description: "Queries made through Google, Brave, and DuckDuckGo, independent of browser choice.",
+    description: "Queries answered by major and privacy-focused search engines.",
     accent: "#a8d8ff",
     ink: "#062c4d",
     Icon: MagnifyingGlass,
@@ -541,6 +673,13 @@ function formatValue(metric: Metric, value = metric.value) {
   if (metric.value < 1_000) return value.toFixed(2);
   if (metric.value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
+}
+
+function valueSizeClass(metric: Metric) {
+  const length = formatValue(metric).length;
+  if (length >= 9) return "value-compact";
+  if (length >= 7) return "value-long";
+  return "";
 }
 
 function AnimatedValue({ metric, active }: { metric: Metric; active: boolean }) {
@@ -610,16 +749,11 @@ function MetricCard({
 
         <span className="metric-answer" aria-hidden={!revealed}>
           <span className="answer-kicker">Every 60 seconds</span>
-          <span className="metric-swarm" aria-hidden="true">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <Icon className="metric-particle" key={index} size={20} weight="duotone" />
-            ))}
-          </span>
-          <span className="answer-value">
+          <span className={`answer-value ${valueSizeClass(metric)}`}>
             <AnimatedValue metric={metric} active={revealed} />
             <small aria-hidden="true">{metric.suffix}</small>
-            <span className="sr-only">{`${formatValue(metric)}${metric.suffix}`}</span>
           </span>
+          <span className="sr-only">{`${formatValue(metric)}${metric.suffix}`}</span>
           <span className="answer-fact">{metric.fact}</span>
         </span>
 
@@ -699,12 +833,6 @@ export default function Home() {
       </header>
 
       <section className="hero" id="top">
-        <div className="hero-signal-field" aria-hidden="true">
-          <span className="data-packet packet-email"><EnvelopeSimple size={18} weight="duotone" /> email</span>
-          <span className="data-packet packet-post"><XLogo size={17} weight="bold" /> post</span>
-          <span className="data-packet packet-query"><MagnifyingGlass size={17} weight="bold" /> query</span>
-          <span className="data-packet packet-download"><DownloadSimple size={18} weight="bold" /> download</span>
-        </div>
         <div className="hero-copy">
           <p className="overline">A one-minute data game</p>
           <h1>The internet makes <em>a lot</em> in 60 seconds.</h1>
