@@ -678,7 +678,7 @@ function formatValue(metric: Metric, value = metric.value) {
 function valueSizeClass(metric: Metric) {
   const length = formatValue(metric).length;
   if (length >= 9) return "value-compact";
-  if (length >= 7) return "value-long";
+  if (length >= 6) return "value-long";
   return "";
 }
 
