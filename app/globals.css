@@ -1,3 +1,9 @@
+@property --motion-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #734cff;
+}
+
 :root {
   --paper: #f4f1e8;
   --ink: #131313;
@@ -27,7 +33,10 @@ button, a { font: inherit; }
 button { color: inherit; }
 a { color: inherit; }
 
-main { overflow: hidden; }
+main {
+  --motion-accent: var(--purple);
+  overflow: hidden;
+}
 
 .sr-only {
   clip: rect(0, 0, 0, 0);
@@ -58,7 +67,7 @@ main { overflow: hidden; }
 }
 
 .wordmark-dot {
-  background: var(--purple);
+  background: var(--motion-accent);
   border-radius: 50%;
   height: 16px;
   position: relative;
@@ -66,7 +75,7 @@ main { overflow: hidden; }
 }
 
 .wordmark-dot::after {
-  border: 2px solid var(--purple);
+  border: 2px solid var(--motion-accent);
   border-radius: 50%;
   content: "";
   inset: -6px;
@@ -111,7 +120,7 @@ h1 {
 }
 
 h1 em {
-  color: var(--purple);
+  color: var(--motion-accent);
   font-style: normal;
   white-space: nowrap;
 }
@@ -146,7 +155,7 @@ h1 em {
 .timer-ring {
   --progress: 360deg;
   align-items: center;
-  background: conic-gradient(var(--purple) var(--progress), rgba(19, 19, 19, 0.1) 0);
+  background: conic-gradient(var(--motion-accent) var(--progress), rgba(19, 19, 19, 0.1) 0);
   border-radius: 50%;
   display: flex;
   height: clamp(250px, 28vw, 360px);
@@ -169,11 +178,12 @@ h1 em {
 }
 
 .timer-ring::after {
-  border: 2px dashed rgba(119, 72, 246, 0.66);
+  border: 2px dashed color-mix(in srgb, var(--motion-accent) 68%, transparent);
   inset: -24px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  main { animation: accent-carousel 16s ease-in-out infinite; }
   .timer-ring::after { animation: orbit-spin 14s linear infinite; }
 }
 
@@ -436,6 +446,14 @@ footer p { margin: 0; }
 footer a { font-weight: 800; }
 
 @keyframes orbit-spin { to { transform: rotate(360deg); } }
+@keyframes accent-carousel {
+  0%, 100% { --motion-accent: #734cff; }
+  16% { --motion-accent: #e8399b; }
+  32% { --motion-accent: #f05236; }
+  48% { --motion-accent: #b47c00; }
+  64% { --motion-accent: #008f82; }
+  80% { --motion-accent: #1677e8; }
+}
 @keyframes timer-pulse { 50% { transform: scale(1.015); } }
 @keyframes number-settle {
   0% { opacity: .4; transform: translateY(12px) scale(.96); }
