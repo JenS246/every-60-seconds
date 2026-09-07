@@ -24,7 +24,9 @@ npm run build
 
 ## Publishing
 
-This project is configured for OpenAI Sites through `.openai/hosting.json`. The live URL is added here after the first deployment.
+This project is configured for OpenAI Sites through `.openai/hosting.json`.
+
+Live site: https://every-60-seconds.dschnei1122.chatgpt.site
 
 ## Data notes
 
