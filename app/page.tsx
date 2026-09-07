@@ -1012,7 +1012,6 @@ export default function Home() {
         <div className="method-intro">
           <h2>How the minute is made</h2>
           <p>Every figure is normalized to 60 seconds from the newest credible public total we could find. Platform reporting is uneven, so estimates are labeled and older disclosures are dated instead of pretending they are live counters.</p>
-          <p className="domo-note"><strong>What is Domo?</strong> Domo is a business intelligence company, not a social platform or an official internet census. Its annual <a href="https://www.domo.com/learn/infographic/data-never-sleeps-12" target="_blank" rel="noreferrer">Data Never Sleeps</a> graphic compiles statistics from outside sources. We use it only where no stronger current platform disclosure is available, and label those figures as secondary estimates.</p>
         </div>
         <div className="method-list">
           {[overviewMetric, ...metrics].map((metric) => (

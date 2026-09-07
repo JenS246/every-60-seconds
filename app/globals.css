@@ -411,9 +411,6 @@ h1 em {
 
 .method-intro { position: sticky; top: 32px; align-self: start; }
 .method-intro p { color: var(--muted); font-size: 17px; line-height: 1.65; margin: 26px 0 0; }
-.method-intro .domo-note { border-left: 3px solid var(--purple); color: var(--ink); font-size: 15px; margin-top: 24px; padding-left: 16px; }
-.domo-note strong { display: block; font-size: 16px; margin-bottom: 5px; }
-.domo-note a { font-weight: 700; text-underline-offset: 3px; }
 .method-list { border-top: 1px solid var(--line); }
 .method-list details { border-bottom: 1px solid var(--line); padding: 19px 0; }
 .method-list summary { align-items: center; cursor: pointer; display: flex; justify-content: space-between; list-style: none; }
