@@ -28,7 +28,7 @@ import {
   VideoCamera,
   XLogo,
 } from "@phosphor-icons/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Status = "idle" | "running" | "finished";
 type CategoryId = "social" | "communication" | "creation" | "ai" | "search" | "downloads";
@@ -198,7 +198,7 @@ const metrics: Metric[] = [
     value: 261_388_889,
     suffix: " emails",
     fact: "More than 4.3 million emails leave an outbox every second.",
-    source: "Radicati Email Statistics 2024–2028",
+    source: "Radicati Email Statistics 2024-2028",
     sourceUrl: "https://www.radicati.com/wp/wp-content/uploads/2024/12/Email-Statistics-Report-2024-2028-Executive-Summary.pdf",
     basis: "376.4 billion emails projected per day in 2025, divided by 1,440 minutes.",
     sourceDate: "2024 forecast for 2025",
@@ -469,7 +469,7 @@ const metrics: Metric[] = [
     fact: "Developers download React about 284 times every second.",
     source: "npm Downloads API",
     sourceUrl: "https://api.npmjs.org/downloads/point/last-week/react",
-    basis: "171,637,376 React package downloads from August 23–29, 2026, divided across one week.",
+    basis: "171,637,376 React package downloads from August 23-29, 2026, divided across one week.",
     sourceDate: "August 2026",
     Icon: Package,
     accent: "#75dff7",
@@ -481,7 +481,7 @@ const metrics: Metric[] = [
 const categories: Category[] = [
   {
     id: "social",
-    eyebrow: "Category 01",
+    eyebrow: "Social networks",
     title: "Social media",
     description: "Posts, shares, selfies, and the endless public feed.",
     accent: "#ff8fcb",
@@ -490,7 +490,7 @@ const categories: Category[] = [
   },
   {
     id: "communication",
-    eyebrow: "Category 02",
+    eyebrow: "Messages",
     title: "Communication",
     description: "What moves through inboxes, chats, and voice notes.",
     accent: "#72e3d2",
@@ -499,7 +499,7 @@ const categories: Category[] = [
   },
   {
     id: "creation",
-    eyebrow: "Category 03",
+    eyebrow: "Publishing",
     title: "Create & publish",
     description: "Fresh videos, code, and domain names added to the internet.",
     accent: "#ff775d",
@@ -508,7 +508,7 @@ const categories: Category[] = [
   },
   {
     id: "ai",
-    eyebrow: "Category 04",
+    eyebrow: "Generative systems",
     title: "AI tools",
     description: "Prompts, queries, and tokens moving through popular AI services.",
     accent: "#c6a5ff",
@@ -517,16 +517,16 @@ const categories: Category[] = [
   },
   {
     id: "search",
-    eyebrow: "Category 05",
+    eyebrow: "Discovery",
     title: "Search engines",
-    description: "Queries made through Google, Brave, and DuckDuckGo—independent of browser choice.",
+    description: "Queries made through Google, Brave, and DuckDuckGo, independent of browser choice.",
     accent: "#a8d8ff",
     ink: "#062c4d",
     Icon: MagnifyingGlass,
   },
   {
     id: "downloads",
-    eyebrow: "Category 06",
+    eyebrow: "Installs",
     title: "Downloads",
     description: "Apps, games, AI tools, and software packages pulled onto devices.",
     accent: "#9be6a6",
@@ -537,10 +537,45 @@ const categories: Category[] = [
 
 const totalMetrics = metrics.length + 1;
 
-function formatValue(metric: Metric) {
-  if (metric.value < 1_000) return metric.value.toFixed(2);
-  if (metric.value >= 1_000_000_000) return `${(metric.value / 1_000_000_000).toFixed(1)}B`;
-  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(metric.value);
+function formatValue(metric: Metric, value = metric.value) {
+  if (metric.value < 1_000) return value.toFixed(2);
+  if (metric.value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
+}
+
+function AnimatedValue({ metric, active }: { metric: Metric; active: boolean }) {
+  const valueRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const element = valueRef.current;
+    if (!element) return;
+
+    if (!active) {
+      element.textContent = formatValue(metric, 0);
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      element.textContent = formatValue(metric);
+      return;
+    }
+
+    let frame = 0;
+    const start = performance.now();
+    const duration = metric.value >= 1_000_000_000 ? 1_450 : 1_100;
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 4);
+      element.textContent = formatValue(metric, metric.value * eased);
+      if (progress < 1) frame = window.requestAnimationFrame(tick);
+    };
+
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
+  }, [active, metric]);
+
+  return <span ref={valueRef} aria-hidden="true">{formatValue(metric, 0)}</span>;
 }
 
 function MetricCard({
@@ -575,7 +610,16 @@ function MetricCard({
 
         <span className="metric-answer" aria-hidden={!revealed}>
           <span className="answer-kicker">Every 60 seconds</span>
-          <span className="answer-value">{formatValue(metric)}<small>{metric.suffix}</small></span>
+          <span className="metric-swarm" aria-hidden="true">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Icon className="metric-particle" key={index} size={20} weight="duotone" />
+            ))}
+          </span>
+          <span className="answer-value">
+            <AnimatedValue metric={metric} active={revealed} />
+            <small aria-hidden="true">{metric.suffix}</small>
+            <span className="sr-only">{`${formatValue(metric)}${metric.suffix}`}</span>
+          </span>
           <span className="answer-fact">{metric.fact}</span>
         </span>
 
@@ -655,6 +699,12 @@ export default function Home() {
       </header>
 
       <section className="hero" id="top">
+        <div className="hero-signal-field" aria-hidden="true">
+          <span className="data-packet packet-email"><EnvelopeSimple size={18} weight="duotone" /> email</span>
+          <span className="data-packet packet-post"><XLogo size={17} weight="bold" /> post</span>
+          <span className="data-packet packet-query"><MagnifyingGlass size={17} weight="bold" /> query</span>
+          <span className="data-packet packet-download"><DownloadSimple size={18} weight="bold" /> download</span>
+        </div>
         <div className="hero-copy">
           <p className="overline">A one-minute data game</p>
           <h1>The internet makes <em>a lot</em> in 60 seconds.</h1>
