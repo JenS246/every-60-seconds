@@ -2,6 +2,7 @@
 
 import {
   ArrowClockwise,
+  ArrowRight,
   Brain,
   Browser,
   Browsers,
@@ -43,7 +44,7 @@ import {
 } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-type Status = "idle" | "running" | "finished";
+type Status = "idle" | "preparing" | "running" | "finished" | "reviewing";
 type CategoryId = "social" | "communication" | "creation" | "streaming" | "ai" | "search" | "browsers" | "downloads";
 
 type Metric = {
@@ -967,13 +968,26 @@ function MetricCard({
   revealed,
   onReveal,
   featured = false,
+  sourceInteractive = true,
+  triggerRef,
 }: {
   metric: Metric;
   revealed: boolean;
   onReveal: (metric: Metric) => void;
   featured?: boolean;
+  sourceInteractive?: boolean;
+  triggerRef?: React.Ref<HTMLButtonElement>;
 }) {
   const Icon = metric.Icon;
+  const sourceDetails = (
+    <>
+      <span>{metric.source}</span>
+      <span className="source-date-row">
+        <span className="source-date">{metric.sourceDate}</span>
+        {metric.estimated && <span className="estimate-label" aria-label="Estimated figure">Est.</span>}
+      </span>
+    </>
+  );
 
   return (
     <article
@@ -983,6 +997,7 @@ function MetricCard({
       <button
         className="metric-trigger"
         onClick={() => onReveal(metric)}
+        ref={triggerRef}
         aria-label={revealed ? `${metric.title}: ${formatValue(metric)}${metric.suffix}. ${metric.fact}` : `Reveal ${metric.title}`}
       >
         <span className="metric-topline">
@@ -1010,13 +1025,11 @@ function MetricCard({
         </span>
       </button>
 
-      <a className="metric-source" href={metric.sourceUrl} target="_blank" rel="noreferrer">
-        <span>{metric.source}</span>
-        <span className="source-date-row">
-          <span className="source-date">{metric.sourceDate}</span>
-          {metric.estimated && <span className="estimate-label" aria-label="Estimated figure">Est.</span>}
-        </span>
-      </a>
+      {sourceInteractive ? (
+        <a className="metric-source" href={metric.sourceUrl} target="_blank" rel="noreferrer">{sourceDetails}</a>
+      ) : (
+        <div className="metric-source metric-source-static" aria-label={`Source: ${metric.source}. ${metric.sourceDate}.`}>{sourceDetails}</div>
+      )}
     </article>
   );
 }
@@ -1024,27 +1037,57 @@ function MetricCard({
 export default function Home() {
   const [status, setStatus] = useState<Status>("idle");
   const [timeLeft, setTimeLeft] = useState(60);
+  const [countdown, setCountdown] = useState(3);
+  const [countdownActive, setCountdownActive] = useState(false);
   const [challengeMetrics, setChallengeMetrics] = useState<Metric[]>([]);
   const [challengeRevealed, setChallengeRevealed] = useState<Set<string>>(new Set());
+  const [activeMetricIndex, setActiveMetricIndex] = useState(0);
+  const [completionSeconds, setCompletionSeconds] = useState<number | null>(null);
   const [explorerRevealed, setExplorerRevealed] = useState<Set<string>>(new Set());
   const [openCategories, setOpenCategories] = useState<Set<CategoryId>>(new Set());
   const challengeRef = useRef<HTMLElement>(null);
   const explorerRef = useRef<HTMLElement>(null);
   const resultRef = useRef<HTMLElement>(null);
+  const activeTriggerRef = useRef<HTMLButtonElement>(null);
+  const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
+  const roundStartRef = useRef<number | null>(null);
   const scrollTimerRef = useRef<number | null>(null);
 
   const startChallenge = useCallback(() => {
     if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
     setChallengeMetrics(buildChallengeMetrics());
     setChallengeRevealed(new Set());
+    setActiveMetricIndex(0);
+    setCompletionSeconds(null);
     setTimeLeft(60);
-    setStatus("running");
+    setCountdown(3);
+    setCountdownActive(false);
+    roundStartRef.current = null;
+    setStatus("preparing");
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    scrollTimerRef.current = window.setTimeout(() => {
+    window.requestAnimationFrame(() => {
       challengeRef.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
-    }, reducedMotion ? 0 : 360);
+    });
+    scrollTimerRef.current = window.setTimeout(() => setCountdownActive(true), reducedMotion ? 120 : 520);
   }, []);
+
+  useEffect(() => {
+    if (status !== "preparing" || !countdownActive) return;
+    const countdownTimer = window.setInterval(() => {
+      setCountdown((current) => {
+        if (current <= 1) {
+          window.clearInterval(countdownTimer);
+          roundStartRef.current = performance.now();
+          setCountdownActive(false);
+          setStatus("running");
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 650);
+    return () => window.clearInterval(countdownTimer);
+  }, [countdownActive, status]);
 
   useEffect(() => {
     if (status !== "running") return;
@@ -1052,6 +1095,7 @@ export default function Home() {
       setTimeLeft((current) => {
         if (current <= 1) {
           window.clearInterval(timer);
+          setCompletionSeconds(60);
           setStatus("finished");
           return 0;
         }
@@ -1072,13 +1116,28 @@ export default function Home() {
   }, []);
 
   const revealChallengeMetric = useCallback((metric: Metric) => {
-    if (status !== "running") return;
-    setChallengeRevealed((current) => {
-      const next = new Set(current);
-      next.add(metric.id);
-      return next;
-    });
-  }, [status]);
+    if (status !== "running" || challengeRevealed.has(metric.id)) return;
+    const next = new Set(challengeRevealed);
+    next.add(metric.id);
+    setChallengeRevealed(next);
+
+    if (next.size === challengeMetrics.length) {
+      const elapsed = roundStartRef.current === null
+        ? 60 - timeLeft
+        : Math.ceil((performance.now() - roundStartRef.current) / 1_000);
+      const completedIn = Math.min(60, Math.max(1, elapsed));
+      setCompletionSeconds(completedIn);
+      setTimeLeft(60 - completedIn);
+      setStatus("finished");
+    }
+  }, [challengeMetrics.length, challengeRevealed, status, timeLeft]);
+
+  const goToNextMetric = useCallback(() => {
+    const activeMetric = challengeMetrics[activeMetricIndex];
+    if (status !== "running" || !activeMetric || !challengeRevealed.has(activeMetric.id)) return;
+    setActiveMetricIndex((current) => Math.min(current + 1, challengeMetrics.length - 1));
+    window.requestAnimationFrame(() => activeTriggerRef.current?.focus({ preventScroll: true }));
+  }, [activeMetricIndex, challengeMetrics, challengeRevealed, status]);
 
   const revealExplorerMetric = useCallback((metric: Metric) => {
     setExplorerRevealed((current) => {
@@ -1090,19 +1149,38 @@ export default function Home() {
 
   const toggleCategory = (categoryId: CategoryId) => {
     setOpenCategories((current) => {
+      const mobileAccordion = window.matchMedia("(max-width: 780px)").matches;
       const next = new Set(current);
       if (next.has(categoryId)) next.delete(categoryId);
+      else if (mobileAccordion) return new Set([categoryId]);
       else next.add(categoryId);
       return next;
     });
   };
 
+  const reviewRound = useCallback(() => {
+    if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+    setStatus("reviewing");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.requestAnimationFrame(() => {
+      challengeRef.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    });
+    scrollTimerRef.current = window.setTimeout(
+      () => reviewHeadingRef.current?.focus({ preventScroll: true }),
+      reducedMotion ? 40 : 420,
+    );
+  }, []);
+
   const exploreAll = useCallback(() => {
     if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
     setStatus("idle");
     setTimeLeft(60);
+    setCountdownActive(false);
     setChallengeMetrics([]);
     setChallengeRevealed(new Set());
+    setActiveMetricIndex(0);
+    setCompletionSeconds(null);
+    roundStartRef.current = null;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.requestAnimationFrame(() => {
       explorerRef.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
@@ -1111,18 +1189,23 @@ export default function Home() {
 
   const scoreMessage = useMemo(() => {
     if (status !== "finished") return null;
-    if (challengeRevealed.size === challengeMetrics.length) return "You caught every signal. The internet never stood a chance.";
-    if (challengeRevealed.size >= Math.ceil(challengeMetrics.length * 0.7)) return "Sharp work. You uncovered most of this minute.";
-    return "One minute moves fast. Try another mix or explore every data stream.";
+    if (challengeRevealed.size === challengeMetrics.length) return "That was one busy minute.";
+    if (challengeRevealed.size >= Math.ceil(challengeMetrics.length * 0.7)) return "Meanwhile, the internet kept going.";
+    return "A minute moves quickly online.";
   }, [challengeMetrics.length, challengeRevealed.size, status]);
 
-  const announcement = status === "running" && timeLeft === 30
-    ? "30 seconds remaining."
-    : status === "running" && timeLeft === 10
-      ? "10 seconds remaining."
-      : status === "finished" && timeLeft === 0
-        ? `Time expired. You revealed ${challengeRevealed.size} of ${challengeMetrics.length} cards.`
-        : "";
+  const activeMetric = challengeMetrics[activeMetricIndex];
+  const activeMetricRevealed = activeMetric ? challengeRevealed.has(activeMetric.id) : false;
+  const resultSeconds = completionSeconds ?? 60;
+  const announcement = status === "preparing" && countdownActive
+    ? `Starting in ${countdown}.`
+    : status === "running" && timeLeft === 30
+      ? "30 seconds remaining."
+      : status === "running" && timeLeft === 10
+        ? "10 seconds remaining."
+        : status === "finished"
+          ? `Round complete. ${challengeRevealed.size} of ${challengeMetrics.length} in ${resultSeconds} seconds.`
+          : "";
 
   return (
     <main>
@@ -1132,7 +1215,10 @@ export default function Home() {
         <a className="wordmark" href="#top" aria-label="Every 60 Seconds home">
           <span className="wordmark-dot" /> Every 60 Seconds
         </a>
-        <a className="method-link" href="#method">About the numbers</a>
+        <a className="method-link" href="#method">
+          <span className="method-link-full">About the numbers</span>
+          <span className="method-link-short">About</span>
+        </a>
       </header>
 
       <section className="hero" id="top">
@@ -1158,35 +1244,82 @@ export default function Home() {
         </div>
       </section>
 
-      {status === "running" && (
+      {(status === "preparing" || status === "running") && (
         <div className="challenge-status-bar" aria-hidden="true">
-          <strong>{timeLeft} sec</strong>
+          <strong>{status === "preparing" ? (countdownActive ? `Starting in ${countdown}` : "Get ready") : `${timeLeft} sec`}</strong>
           <span>{challengeRevealed.size} / {challengeMetrics.length} revealed</span>
         </div>
       )}
 
       {status !== "idle" && challengeMetrics.length > 0 && (
-        <section className="challenge-section" aria-labelledby="challenge-title" ref={challengeRef}>
+        <section className={`challenge-section ${status}`} aria-labelledby="challenge-title" ref={challengeRef}>
           <div className="section-heading challenge-heading">
             <div>
-              <span className="section-label">Timed challenge</span>
-              <h2 id="challenge-title">How much can you reveal?</h2>
+              <span className="section-label">{status === "reviewing" ? "Completed round" : "Timed challenge"}</span>
+              <h2 id="challenge-title" tabIndex={status === "reviewing" ? -1 : undefined} ref={reviewHeadingRef}>
+                {status === "reviewing" ? "Review this round" : "How much can you reveal?"}
+              </h2>
             </div>
             <div className="score-pill challenge-score">
               <strong>{challengeRevealed.size}</strong> / {challengeMetrics.length} revealed
             </div>
           </div>
-          <p className="challenge-intro">Ten signals, one minute. Tap each card before the clock reaches zero.</p>
-          <div className="metric-grid challenge-grid">
-            {challengeMetrics.map((metric) => (
-              <MetricCard
-                key={metric.id}
-                metric={metric}
-                revealed={challengeRevealed.has(metric.id)}
-                onReveal={revealChallengeMetric}
-              />
-            ))}
-          </div>
+          <p className="challenge-intro">
+            {status === "reviewing"
+              ? `These were the ten signals in your ${resultSeconds}-second round.`
+              : "Reveal the number, take it in, then move to the next signal."}
+          </p>
+
+          {status === "preparing" && (
+            <div className="challenge-countdown" aria-hidden="true">
+              <span key={countdown}>{countdownActive ? countdown : "Ready"}</span>
+            </div>
+          )}
+
+          {(status === "running" || status === "finished") && activeMetric && (
+            <div className="challenge-stage">
+              <div className="challenge-card-slot" key={activeMetric.id}>
+                <MetricCard
+                  metric={activeMetric}
+                  revealed={activeMetricRevealed}
+                  onReveal={revealChallengeMetric}
+                  sourceInteractive={status !== "running"}
+                  triggerRef={activeTriggerRef}
+                />
+              </div>
+              {status === "running" && (
+                <div className="challenge-navigation">
+                  <span>Card {activeMetricIndex + 1} of {challengeMetrics.length}</span>
+                  <button
+                    className="next-button"
+                    onClick={goToNextMetric}
+                    disabled={!activeMetricRevealed}
+                  >
+                    Next <ArrowRight size={19} weight="bold" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {status === "reviewing" && (
+            <>
+              <div className="metric-grid challenge-review-grid">
+                {challengeMetrics.map((metric) => (
+                  <MetricCard
+                    key={metric.id}
+                    metric={metric}
+                    revealed
+                    onReveal={() => undefined}
+                  />
+                ))}
+              </div>
+              <div className="review-actions">
+                <button className="result-primary" onClick={startChallenge}><ArrowClockwise size={18} weight="bold" /> Play again</button>
+                <button className="result-secondary" onClick={exploreAll}>Explore all data</button>
+              </div>
+            </>
+          )}
         </section>
       )}
 
@@ -1201,12 +1334,13 @@ export default function Home() {
         >
           <div className="result-copy">
             <span className="result-kicker">Round complete</span>
-            <h2 id="round-result-title">You revealed {challengeRevealed.size} of {challengeMetrics.length}.</h2>
+            <h2 id="round-result-title">{challengeRevealed.size} of {challengeMetrics.length} in {resultSeconds} seconds.</h2>
             <p>{scoreMessage}</p>
           </div>
           <div className="result-actions">
             <button className="result-primary" onClick={startChallenge}><ArrowClockwise size={18} weight="bold" /> Play again</button>
-            <button className="result-secondary" onClick={exploreAll}>Explore all data</button>
+            <button className="result-secondary" onClick={reviewRound}>Review this round</button>
+            <button className="result-secondary result-explore" onClick={exploreAll}>Explore all data</button>
           </div>
         </section>
       )}
