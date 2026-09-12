@@ -886,6 +886,26 @@ const categories: Category[] = [
 ];
 
 const totalMetrics = metrics.length + 1;
+const challengeSize = 10;
+
+function shuffled<T>(items: T[]) {
+  const next = [...items];
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
+  }
+  return next;
+}
+
+function buildChallengeMetrics() {
+  const categoryPicks = shuffled(categories).map((category) => {
+    const categoryMetrics = metrics.filter((metric) => metric.category === category.id);
+    return shuffled(categoryMetrics)[0];
+  });
+  const pickedIds = new Set(categoryPicks.map((metric) => metric.id));
+  const remaining = shuffled(metrics.filter((metric) => !pickedIds.has(metric.id)));
+  return shuffled([...categoryPicks, ...remaining.slice(0, challengeSize - categoryPicks.length)]);
+}
 
 function formatValue(metric: Metric, value = metric.value) {
   if (metric.value < 1_000) return Number.isInteger(metric.value) ? Math.round(value).toLocaleString("en-US") : value.toFixed(2);
@@ -960,12 +980,16 @@ function MetricCard({
       className={`metric-card ${featured ? "featured" : ""} ${revealed ? "revealed" : ""}`}
       style={{ "--accent": metric.accent, "--ink": metric.ink } as React.CSSProperties}
     >
-      <button className="metric-trigger" onClick={() => onReveal(metric)} aria-expanded={revealed}>
+      <button
+        className="metric-trigger"
+        onClick={() => onReveal(metric)}
+        aria-label={revealed ? `${metric.title}: ${formatValue(metric)}${metric.suffix}. ${metric.fact}` : `Reveal ${metric.title}`}
+      >
         <span className="metric-topline">
           <span className="metric-icon"><Icon size={featured ? 42 : 34} weight="duotone" /></span>
         </span>
 
-        <span className="metric-front">
+        <span className="metric-front" aria-hidden={revealed}>
           <span className={`metric-title ${titleSizeClass(metric)}`}>{metric.title}</span>
           <span className="metric-prompt">{metric.prompt}</span>
           <span className="tap-cue"><Sparkle size={16} weight="fill" /> Tap to reveal</span>
@@ -988,7 +1012,10 @@ function MetricCard({
 
       <a className="metric-source" href={metric.sourceUrl} target="_blank" rel="noreferrer">
         <span>{metric.source}</span>
-        <span className="source-date">{metric.sourceDate}</span>
+        <span className="source-date-row">
+          <span className="source-date">{metric.sourceDate}</span>
+          {metric.estimated && <span className="estimate-label" aria-label="Estimated figure">Est.</span>}
+        </span>
       </a>
     </article>
   );
@@ -997,14 +1024,26 @@ function MetricCard({
 export default function Home() {
   const [status, setStatus] = useState<Status>("idle");
   const [timeLeft, setTimeLeft] = useState(60);
-  const [revealed, setRevealed] = useState<Set<string>>(new Set());
+  const [challengeMetrics, setChallengeMetrics] = useState<Metric[]>([]);
+  const [challengeRevealed, setChallengeRevealed] = useState<Set<string>>(new Set());
+  const [explorerRevealed, setExplorerRevealed] = useState<Set<string>>(new Set());
   const [openCategories, setOpenCategories] = useState<Set<CategoryId>>(new Set());
+  const challengeRef = useRef<HTMLElement>(null);
+  const explorerRef = useRef<HTMLElement>(null);
+  const resultRef = useRef<HTMLElement>(null);
+  const scrollTimerRef = useRef<number | null>(null);
 
-  const startRound = useCallback(() => {
-    setRevealed(new Set());
-    setOpenCategories(new Set());
+  const startChallenge = useCallback(() => {
+    if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+    setChallengeMetrics(buildChallengeMetrics());
+    setChallengeRevealed(new Set());
     setTimeLeft(60);
     setStatus("running");
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    scrollTimerRef.current = window.setTimeout(() => {
+      challengeRef.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    }, reducedMotion ? 0 : 360);
   }, []);
 
   useEffect(() => {
@@ -1022,17 +1061,34 @@ export default function Home() {
     return () => window.clearInterval(timer);
   }, [status]);
 
-  const revealMetric = useCallback((metric: Metric) => {
-    if (status === "idle") setStatus("running");
-    setRevealed((current) => {
+  useEffect(() => {
+    if (status !== "finished") return;
+    const frame = window.requestAnimationFrame(() => resultRef.current?.focus({ preventScroll: true }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [status]);
+
+  useEffect(() => () => {
+    if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+  }, []);
+
+  const revealChallengeMetric = useCallback((metric: Metric) => {
+    if (status !== "running") return;
+    setChallengeRevealed((current) => {
       const next = new Set(current);
       next.add(metric.id);
       return next;
     });
   }, [status]);
 
+  const revealExplorerMetric = useCallback((metric: Metric) => {
+    setExplorerRevealed((current) => {
+      const next = new Set(current);
+      next.add(metric.id);
+      return next;
+    });
+  }, []);
+
   const toggleCategory = (categoryId: CategoryId) => {
-    if (status === "idle") setStatus("running");
     setOpenCategories((current) => {
       const next = new Set(current);
       if (next.has(categoryId)) next.delete(categoryId);
@@ -1041,15 +1097,37 @@ export default function Home() {
     });
   };
 
+  const exploreAll = useCallback(() => {
+    if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+    setStatus("idle");
+    setTimeLeft(60);
+    setChallengeMetrics([]);
+    setChallengeRevealed(new Set());
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.requestAnimationFrame(() => {
+      explorerRef.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    });
+  }, []);
+
   const scoreMessage = useMemo(() => {
     if (status !== "finished") return null;
-    if (revealed.size === totalMetrics) return "You caught every signal. The internet never stood a chance.";
-    if (revealed.size >= Math.ceil(totalMetrics * 0.7)) return "Sharp work. You uncovered most of a minute online.";
-    return "One minute moves fast. Open another round and keep exploring.";
-  }, [revealed.size, status]);
+    if (challengeRevealed.size === challengeMetrics.length) return "You caught every signal. The internet never stood a chance.";
+    if (challengeRevealed.size >= Math.ceil(challengeMetrics.length * 0.7)) return "Sharp work. You uncovered most of this minute.";
+    return "One minute moves fast. Try another mix or explore every data stream.";
+  }, [challengeMetrics.length, challengeRevealed.size, status]);
+
+  const announcement = status === "running" && timeLeft === 30
+    ? "30 seconds remaining."
+    : status === "running" && timeLeft === 10
+      ? "10 seconds remaining."
+      : status === "finished" && timeLeft === 0
+        ? `Time expired. You revealed ${challengeRevealed.size} of ${challengeMetrics.length} cards.`
+        : "";
 
   return (
     <main>
+      <p className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</p>
+
       <header className="site-header">
         <a className="wordmark" href="#top" aria-label="Every 60 Seconds home">
           <span className="wordmark-dot" /> Every 60 Seconds
@@ -1059,15 +1137,18 @@ export default function Home() {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <h1>The internet makes <em>a lot</em> in 60 seconds.</h1>
-          <p className="hero-intro">Open a category. Tap each data stream. See how much of our digital world appears before the clock runs out.</p>
-          <button className="start-button" onClick={startRound}>
+          <h1><em>A lot</em> happens on the internet in 60 seconds.</h1>
+          <p className="hero-intro">Play a one-minute challenge, or explore every data stream at your own pace.</p>
+          <div className="hero-actions">
+            <button className="start-button" onClick={startChallenge}>
             {status === "idle" ? <Play size={20} weight="fill" /> : <ArrowClockwise size={20} weight="bold" />}
             {status === "idle" ? "Start the minute" : "Restart the minute"}
-          </button>
+            </button>
+            <button className="explore-button" onClick={exploreAll}>Explore all data</button>
+          </div>
         </div>
 
-        <div className={`timer-orbit ${status}`} aria-live="polite">
+        <div className={`timer-orbit ${status}`} aria-hidden="true">
           <div className="timer-ring" style={{ "--progress": `${(timeLeft / 60) * 360}deg` } as React.CSSProperties}>
             <div className="timer-face">
               <span className="timer-number">{timeLeft}</span>
@@ -1077,30 +1158,79 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="game-section" aria-labelledby="game-title">
+      {status === "running" && (
+        <div className="challenge-status-bar" aria-hidden="true">
+          <strong>{timeLeft} sec</strong>
+          <span>{challengeRevealed.size} / {challengeMetrics.length} revealed</span>
+        </div>
+      )}
+
+      {status !== "idle" && challengeMetrics.length > 0 && (
+        <section className="challenge-section" aria-labelledby="challenge-title" ref={challengeRef}>
+          <div className="section-heading challenge-heading">
+            <div>
+              <span className="section-label">Timed challenge</span>
+              <h2 id="challenge-title">How much can you reveal?</h2>
+            </div>
+            <div className="score-pill challenge-score">
+              <strong>{challengeRevealed.size}</strong> / {challengeMetrics.length} revealed
+            </div>
+          </div>
+          <p className="challenge-intro">Ten signals, one minute. Tap each card before the clock reaches zero.</p>
+          <div className="metric-grid challenge-grid">
+            {challengeMetrics.map((metric) => (
+              <MetricCard
+                key={metric.id}
+                metric={metric}
+                revealed={challengeRevealed.has(metric.id)}
+                onReveal={revealChallengeMetric}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {status === "finished" && (
+        <section
+          className="round-result"
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby="round-result-title"
+          tabIndex={-1}
+          ref={resultRef}
+        >
+          <div className="result-copy">
+            <span className="result-kicker">Round complete</span>
+            <h2 id="round-result-title">You revealed {challengeRevealed.size} of {challengeMetrics.length}.</h2>
+            <p>{scoreMessage}</p>
+          </div>
+          <div className="result-actions">
+            <button className="result-primary" onClick={startChallenge}><ArrowClockwise size={18} weight="bold" /> Play again</button>
+            <button className="result-secondary" onClick={exploreAll}>Explore all data</button>
+          </div>
+        </section>
+      )}
+
+      <section className="game-section" aria-labelledby="game-title" id="explore" ref={explorerRef}>
         <div className="section-heading">
-          <h2 id="game-title">What gets made in a minute?</h2>
-          <div className="score-pill" aria-live="polite">
-            <strong>{revealed.size}</strong> / {totalMetrics} revealed
+          <div>
+            <span className="section-label">Explore all data</span>
+            <h2 id="game-title">What happens in a minute?</h2>
+          </div>
+          <div className="score-pill">
+            <strong>{explorerRevealed.size}</strong> / {totalMetrics} revealed
           </div>
         </div>
 
-        {status === "finished" && (
-          <div className="result-banner" role="status">
-            <Sparkle size={24} weight="fill" />
-            <span>{scoreMessage}</span>
-          </div>
-        )}
-
         <div className="overview-wrap">
-          <MetricCard metric={overviewMetric} revealed={revealed.has(overviewMetric.id)} onReveal={revealMetric} featured />
+          <MetricCard metric={overviewMetric} revealed={explorerRevealed.has(overviewMetric.id)} onReveal={revealExplorerMetric} featured />
         </div>
 
         <div className="category-list">
           {categories.map((category) => {
             const children = metrics.filter((metric) => metric.category === category.id);
             const isOpen = openCategories.has(category.id);
-            const revealedInCategory = children.filter((metric) => revealed.has(metric.id)).length;
+            const revealedInCategory = children.filter((metric) => explorerRevealed.has(metric.id)).length;
             const CategoryIcon = category.Icon;
             return (
               <section
@@ -1126,15 +1256,13 @@ export default function Home() {
                   </span>
                 </button>
 
-                {isOpen && (
-                  <div className="category-body" id={`category-${category.id}`}>
+                  <div className="category-body" id={`category-${category.id}`} hidden={!isOpen}>
                     <div className="metric-grid">
                       {children.map((metric) => (
-                        <MetricCard key={metric.id} metric={metric} revealed={revealed.has(metric.id)} onReveal={revealMetric} />
+                        <MetricCard key={metric.id} metric={metric} revealed={explorerRevealed.has(metric.id)} onReveal={revealExplorerMetric} />
                       ))}
                     </div>
                   </div>
-                )}
               </section>
             );
           })}
