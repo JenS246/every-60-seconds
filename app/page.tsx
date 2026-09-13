@@ -834,7 +834,7 @@ const categories: Category[] = [
     id: "creation",
     eyebrow: "Publishing",
     title: "Create & publish",
-    description: "Fresh videos, code, and domain names added to the internet.",
+    description: "Fresh videos, code, and domain names added to the Internet.",
     accent: "#ff775d",
     ink: "#401007",
     Icon: Megaphone,
@@ -1052,6 +1052,8 @@ export default function Home() {
   const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const roundStartRef = useRef<number | null>(null);
   const scrollTimerRef = useRef<number | null>(null);
+  const categoryScrollTimerRef = useRef<number | null>(null);
+  const categoryRefs = useRef<Partial<Record<CategoryId, HTMLElement | null>>>({});
 
   const startChallenge = useCallback(() => {
     if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
@@ -1113,6 +1115,7 @@ export default function Home() {
 
   useEffect(() => () => {
     if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+    if (categoryScrollTimerRef.current) window.clearTimeout(categoryScrollTimerRef.current);
   }, []);
 
   const revealChallengeMetric = useCallback((metric: Metric) => {
@@ -1148,14 +1151,28 @@ export default function Home() {
   }, []);
 
   const toggleCategory = (categoryId: CategoryId) => {
+    const mobileAccordion = window.matchMedia("(max-width: 780px)").matches;
+    const opening = !openCategories.has(categoryId);
+
     setOpenCategories((current) => {
-      const mobileAccordion = window.matchMedia("(max-width: 780px)").matches;
       const next = new Set(current);
       if (next.has(categoryId)) next.delete(categoryId);
       else if (mobileAccordion) return new Set([categoryId]);
       else next.add(categoryId);
       return next;
     });
+
+    if (mobileAccordion && opening) {
+      if (categoryScrollTimerRef.current) window.clearTimeout(categoryScrollTimerRef.current);
+      categoryScrollTimerRef.current = window.setTimeout(() => {
+        const root = document.documentElement;
+        const previousScrollBehavior = root.style.scrollBehavior;
+        root.style.scrollBehavior = "auto";
+        categoryRefs.current[categoryId]?.scrollIntoView({ behavior: "auto", block: "start" });
+        root.style.scrollBehavior = previousScrollBehavior;
+        categoryScrollTimerRef.current = null;
+      }, 60);
+    }
   };
 
   const reviewRound = useCallback(() => {
@@ -1190,7 +1207,7 @@ export default function Home() {
   const scoreMessage = useMemo(() => {
     if (status !== "finished") return null;
     if (challengeRevealed.size === challengeMetrics.length) return "That was one busy minute.";
-    if (challengeRevealed.size >= Math.ceil(challengeMetrics.length * 0.7)) return "Meanwhile, the internet kept going.";
+    if (challengeRevealed.size >= Math.ceil(challengeMetrics.length * 0.7)) return "Meanwhile, the Internet kept going.";
     return "A minute moves quickly online.";
   }, [challengeMetrics.length, challengeRevealed.size, status]);
 
@@ -1216,14 +1233,14 @@ export default function Home() {
           <span className="wordmark-dot" /> Every 60 Seconds
         </a>
         <a className="method-link" href="#method">
-          <span className="method-link-full">About the numbers</span>
+          <span className="method-link-full">About the Numbers</span>
           <span className="method-link-short">About</span>
         </a>
       </header>
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <h1><em>A lot</em> happens on the internet in 60 seconds.</h1>
+          <h1><em>A lot</em> happens on the Internet in 60 seconds.</h1>
           <p className="hero-intro">Play a one-minute challenge, or explore every data stream at your own pace.</p>
           <div className="hero-actions">
             <button className="start-button" onClick={startChallenge}>
@@ -1370,6 +1387,7 @@ export default function Home() {
               <section
                 className={`category-group ${isOpen ? "open" : ""}`}
                 key={category.id}
+                ref={(node) => { categoryRefs.current[category.id] = node; }}
                 style={{ "--category": category.accent, "--category-ink": category.ink } as React.CSSProperties}
               >
                 <button
@@ -1428,7 +1446,7 @@ export default function Home() {
       </section>
 
       <footer>
-        <p>One human minute. An internet-sized amount of activity.</p>
+        <p>One human minute. An Internet-sized amount of activity.</p>
         <a href="#top">Back to the top ↑</a>
       </footer>
     </main>

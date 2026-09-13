@@ -60,9 +60,12 @@ main {
 .wordmark {
   align-items: center;
   display: flex;
+  font-family: var(--font-caption), sans-serif;
+  font-size: 20px;
   font-weight: 800;
   gap: 10px;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.01em;
+  line-height: 1;
   text-decoration: none;
 }
 
@@ -84,8 +87,11 @@ main {
 
 .method-link {
   border-bottom: 1px solid currentColor;
-  font-size: 15px;
+  font-family: var(--font-caption), sans-serif;
+  font-size: 18px;
   font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
   text-decoration: none;
 }
 
@@ -438,6 +444,7 @@ h1 em {
   border: 1px solid rgba(255,255,255,0.11);
   border-radius: 22px;
   overflow: hidden;
+  scroll-margin-top: 18px;
 }
 
 .category-toggle {
@@ -672,7 +679,14 @@ footer {
   padding: 30px max(28px, calc((100vw - 1184px) / 2));
 }
 
-footer p { margin: 0; }
+footer p {
+  font-family: var(--font-caption), sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  line-height: 1.25;
+  margin: 0;
+}
 footer a { font-weight: 800; }
 
 @keyframes orbit-spin { to { transform: rotate(360deg); } }
@@ -702,6 +716,8 @@ footer a { font-weight: 800; }
 
 @media (max-width: 780px) {
   .site-header { padding: 22px 20px; }
+  .wordmark { font-size: 19px; }
+  .method-link { font-size: 17px; }
   .method-link-full { display: none; }
   .method-link-short { display: inline; }
   .hero { grid-template-columns: 1fr; min-height: auto; padding: 66px 20px 90px; }
