@@ -1308,7 +1308,7 @@ export default function Home() {
                 <div className="challenge-navigation">
                   <span>Card {activeMetricIndex + 1} of {challengeMetrics.length}</span>
                   <button
-                    className="next-button"
+                    className={`next-button ${activeMetricRevealed ? "ready" : ""}`}
                     onClick={goToNextMetric}
                     disabled={!activeMetricRevealed}
                   >
@@ -1356,13 +1356,22 @@ export default function Home() {
           </div>
           <div className="result-actions">
             <button className="result-primary" onClick={startChallenge}><ArrowClockwise size={18} weight="bold" /> Play again</button>
-            <button className="result-secondary" onClick={reviewRound}>Review this round</button>
+            <button className="result-secondary" onClick={reviewRound} aria-label="Review this round">
+              <span className="review-label-full">Review this round</span>
+              <span className="review-label-short">Review</span>
+            </button>
             <button className="result-secondary result-explore" onClick={exploreAll}>Explore all data</button>
           </div>
         </section>
       )}
 
-      <section className="game-section" aria-labelledby="game-title" id="explore" ref={explorerRef}>
+      <section
+        className="game-section"
+        aria-labelledby="game-title"
+        id="explore"
+        ref={explorerRef}
+        hidden={status === "preparing" || status === "running"}
+      >
         <div className="section-heading">
           <div>
             <span className="section-label">Explore all data</span>

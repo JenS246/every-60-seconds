@@ -364,11 +364,18 @@ h1 em {
   min-height: 50px;
   min-width: 126px;
   padding: 12px 19px;
-  transition: opacity 180ms ease, transform 180ms ease;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(5px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+  visibility: hidden;
 }
 
+.next-button.ready { opacity: 1; pointer-events: auto; transform: translateY(0); visibility: visible; }
 .next-button:hover:not(:disabled) { transform: translateY(-2px); }
 .next-button:disabled { cursor: not-allowed; opacity: 0.35; }
+
+.review-label-short { display: none; }
 
 .challenge-review-grid { grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
 
@@ -724,6 +731,8 @@ footer a { font-weight: 800; }
   .hero-copy { text-align: left; }
   h1 { font-size: clamp(50px, 15vw, 76px); }
   .timer-orbit { padding-top: 22px; }
+  .timer-ring { height: 216px; width: 216px; }
+  .timer-number { font-size: 78px; }
   .challenge-section,
   .game-section { padding: 70px 16px 88px; scroll-margin-top: 58px; }
   .challenge-section { min-height: 100dvh; }
@@ -734,8 +743,24 @@ footer a { font-weight: 800; }
   .challenge-intro { margin: -8px 0 24px; }
   .challenge-section.running .challenge-intro,
   .challenge-section.finished .challenge-intro { display: none; }
+  .challenge-section.running { padding-bottom: 28px; padding-top: 48px; }
+  .challenge-section.running .challenge-heading {
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
   .challenge-countdown { min-height: 52dvh; }
   .challenge-stage { max-width: 540px; }
+  .challenge-section.running .metric-card { --card-pad: 24px; --source-clearance: 100px; min-height: 390px; }
+  .challenge-section.running .metric-trigger { padding-top: 20px; }
+  .challenge-section.running .metric-answer { inset: 72px var(--card-pad) var(--source-clearance); }
   .challenge-navigation { padding-bottom: env(safe-area-inset-bottom); }
   .next-button { min-height: 54px; min-width: 140px; }
   .challenge-status-bar { top: calc(10px + env(safe-area-inset-top)); }
@@ -769,6 +794,11 @@ footer a { font-weight: 800; }
   .result-actions { display: grid; grid-template-columns: .8fr 1.2fr; }
   .result-actions button { width: 100%; }
   .result-actions .result-explore { grid-column: 1 / -1; }
+}
+
+@media (max-width: 360px) {
+  .review-label-full { display: none; }
+  .review-label-short { display: inline; }
 }
 
 @media (prefers-reduced-motion: reduce) {
